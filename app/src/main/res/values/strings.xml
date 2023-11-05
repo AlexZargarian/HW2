@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">HW2</string>
+    <string name="yerevan_text">Yerevan is the capital and largest city of Armenia, and one of the world\'s oldest continuously inhabited cities. Situated along the Hrazdan River, Yerevan is the administrative, cultural, and industrial center of the country.</string>
+    <string name="Tehran_text">Tehran is the capital of Iran, in the north of the country. Its central Golestan Palace complex, with its ornate rooms and marble throne, was the seat of power of the Qajar dynasty.The National Jewelry Museum holds many of the Qajar monarchs’ jewels, while the National Museum of Iran has artifacts dating back to Paleolithic times.</string>
+    <string name="Harare_text">Harare is the capital of Zimbabwe. On the edge of landscaped Harare Gardens, the National Gallery of Zimbabwe has a large collection of African contemporary art and traditional pieces like baskets, textiles, jewelry and musical instruments</string>
+    <string name="Rome_text">Rome is the capital city of Italy. It is also the capital of the Lazio region, the centre of the Metropolitan City of Rome, and a special comune named Comune di Roma Capitale.</string>
+    <string name="welcometext">Welcome to my App!</string>
+    <string name="list">List of Cities</string>
+    <string name="welcome_button">Back to Welcome Screen</string>
+    <string name="backToList_button">Back to City List</string>
+</resources>
