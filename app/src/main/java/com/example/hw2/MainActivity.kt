@@ -1,6 +1,7 @@
 package com.example.hw2
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -17,6 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.hw2.ui.theme.HW2Theme
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,6 +126,20 @@ fun CityListScreen(onCitySelected: (String) -> Unit, onBack: () -> Unit) {
 
 @Composable
 fun CityDescriptionScreen(cityInfo: CityInfo, onBack: () -> Unit) {
+    var weather by remember { mutableStateOf<CurrentWeather?>(null) }
+
+    // Use LaunchedEffect to fetch weather data when the screen is first displayed
+    LaunchedEffect(cityInfo.imageUrl) {
+        val weatherService = RetrofitClient.weatherService
+        try {
+            val response = weatherService.getCurrentWeather(cityInfo.description, "24e36c76cec24915aae153838231011")
+            weather = response.current
+        } catch (e: Exception) {
+            // Handle error
+            Log.e("WeatherAPI", "Error fetching weather data", e)
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -133,11 +152,22 @@ fun CityDescriptionScreen(cityInfo: CityInfo, onBack: () -> Unit) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        weather?.let {
+            Text(
+                text = "Current Temperature: ${it.temp_c}°C",
+                style = TextStyle(fontSize = 16.sp, color = Color.Black),
+                lineHeight = 24.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = cityInfo.description,
             style = TextStyle(fontSize = 16.sp, color = Color.Black),
             lineHeight = 24.sp
         )
+
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onBack) {
             Text(text = "Back to City List")
@@ -145,6 +175,45 @@ fun CityDescriptionScreen(cityInfo: CityInfo, onBack: () -> Unit) {
     }
 }
 
+object RetrofitClient {
+    private const val BASE_URL = "https://api.weatherapi.com/v1/"
+
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    val weatherService: WeatherService by lazy {
+        retrofit.create(WeatherService::class.java)
+    }
+}
+
+interface WeatherService {
+    @GET("current.json")
+    suspend fun getCurrentWeather(
+        @Query("q") location: String,
+        @Query("key") apiKey: String
+    ): WeatherResponse
+}
+data class WeatherResponse(
+    val location: Location,
+    val current: CurrentWeather
+)
+
+data class Location(
+    val name: String,
+    val region: String,
+    val country: String,
+    val lat: Double,
+    val lon: Double,
+    // Add other properties as needed
+)
+data class CurrentWeather(
+    val temp_c: Double,
+    // Add other properties you want to display
+)
 
 
 fun getCityInfo(city: String): CityInfo {
@@ -152,6 +221,7 @@ fun getCityInfo(city: String): CityInfo {
         "Yerevan" -> CityInfo(
             description = "Yerevan is the capital and largest city of Armenia, and one of the world's oldest continuously inhabited cities. Situated along the Hrazdan River, Yerevan is the administrative, cultural, and industrial center of the country.",
             imageUrl = "https://www.yerevan.am/uploads/media/page_gallery/0002/17/ebe33ce89f819fef4a1089d51c38b273feccd893.jpeg"
+            //here to add somethigon so we know the call 
         )
         "Tehran" -> {
             CityInfo(
